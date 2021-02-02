@@ -64,5 +64,10 @@ Write a program `alternatesum.py` that
    numbers[2] - numbers[3] + ...` and stores it in a variable `asum`. (You can
    also print `asum`.)
 
+## Guessing game
 
+Write a program `guessinggame.py` that takes a single number `guess`
+as input and compares it to a preset integer number
+`secret_number`. Tell the player if their guess was "too low", "too
+high", or that they "guessed the number".
 
