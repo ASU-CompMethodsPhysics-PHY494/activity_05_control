@@ -5,10 +5,13 @@
 
 import pytest
 
-from ..tst import _test_output
+from ..tst import _test_output, assert_python3
 
 FILENAME = 'guessinggame.py'
 POINTS = 1
+
+def test_python3():
+    assert_python3()
 
 def test_too_high_1():
     return _test_output(FILENAME,

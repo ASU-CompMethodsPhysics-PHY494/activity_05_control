@@ -5,10 +5,13 @@
 
 import pytest
 
-from ..tst import _test_output
+from ..tst import _test_output, assert_python3
 
 FILENAME = 'temperatures.py'
 POINTS = 4
+
+def test_python3():
+    assert_python3()
 
 def test_range():
     return _test_output(FILENAME,

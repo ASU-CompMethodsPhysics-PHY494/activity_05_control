@@ -6,11 +6,14 @@ from io import StringIO
 import subprocess
 import re
 
-# Make sure to run with Python 3 (on GitHub Actions, the default Python `python` is
-# currently 'executable': '/usr/bin/python', 'version': '2.7.17 (default, Sep 30 2020, 13:38:04) \n[GCC 7.5.0]'}
-# see https://github.com/actions/virtual-environments/blob/ubuntu18/20210123.1/images/linux/Ubuntu1804-README.md
-# and https://github.com/actions/virtual-environments/issues/1816
-PYTHON = "python3"
+# Make sure to run with Python 3: Always run pytest under Python 3.
+PYTHON = sys.executable
+
+def assert_python3():
+    if sys.version_info.major < 3:
+        if sys.version_info.major < 6:
+            raise AssertionError(("The python version {v[0]}.{v[1]}.{v[2]} "
+                                  "must be >= 3.6").format(v=sys.version_info))
 
 def assert_variable(name, value, reference, check_type=False):
     if check_type:
@@ -74,4 +77,20 @@ def _test_output(filename, reference, input_values=None):
     output = subprocess.check_output([PYTHON, filename], input=input_values, universal_newlines=True)
     m = re.search(reference, output, flags=re.MULTILINE)
     assert m, f"'{PYTHON} {filename}': output\n\n{output}\n\ndid not match regular expression\n\n{reference}\n\n"
+
+def _test_function(funcname, args, kwargs, reference, mod, check_type=False):
+    mod = pathlib.Path(mod)
+    try:
+        module = importlib.import_module(mod.stem)
+    except ImportError:
+        raise AssertionError(f"File '{mod}' could not be imported.")
+    try:
+        func = getattr(module, funcname)
+    except AttributeError:
+        raise AssertionError(f"File '{mod}' does not contain function '{funcname}'.")
+
+    value = func(*args, **kwargs)
+
+    assert_variable(f"{funcname}(*{args}, **{kwargs})", value, reference, check_type=check_type)
+
 
